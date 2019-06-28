@@ -7,10 +7,10 @@
 pa_get_match_info(guid)
 }
 \arguments{
-\item{guid}{string: the match guid as returned by \code{\link{pa_get_sessions}}}
+\item{guid}{string: the match guid as returned by \code{\link{pa_get_matches}}}
 }
 \value{
-character
+Character.
 }
 \description{
 Retrieve the match information associated with a guid

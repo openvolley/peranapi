@@ -5,5 +5,6 @@ b64gunz <- function(x) {
     ## first four bytes are the buffer size
     rc <- rawConnection(x[seq_along(x)[-1:-4]])
     z <- gzcon(rc)
+    on.exit(close(z))
     readLines(z, warn = FALSE)
 }
