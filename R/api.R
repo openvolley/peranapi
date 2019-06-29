@@ -20,9 +20,14 @@ pa_get_matches <- function(server_name, app_name = "VBStats") {
     assert_that(is.string(app_name), !is.na(app_name))
     my_url <- paste0(pa_opt("base_url"), "/", "GetSessions?appName=", URLencode(app_name), "&serverName=", URLencode(server_name))
     x <- read_xml(my_url)
-    x <- xml_text(xml_contents(x)[[1]])
-    x <- strsplit(x, "~")
-    x <- do.call(rbind, lapply(x, function(z) read.table(text = z, sep = "|", stringsAsFactors = FALSE)))
+    x <- xml_contents(x)
+    if (length(x) > 0) {
+        x <- xml_text(x[[1]])
+        x <- strsplit(x, "~")
+        x <- do.call(rbind, lapply(x, function(z) read.table(text = z, sep = "|", stringsAsFactors = FALSE)))
+    } else {
+        x <- data.frame(guid = character(), teams = character(), date = numeric())
+    }
     setNames(x, c("guid", "teams", "date"))
 }
 
