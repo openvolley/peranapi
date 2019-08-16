@@ -60,13 +60,28 @@ pa_get_match_info <- function(guid) {
 #'
 #' @export
 pa_get_event_data <- function(guid, last_time = 0) {
+    do_get_event_data(guid = guid, ws = "GetLatestStats2", last_time = 0)
+}
+
+## unexported, old version that uses double-gzipped service
+pa_get_event_data0 <- function(guid, last_time = 0) {
+    do_get_event_data(guid = guid, ws = "GetLatestStats", last_time = 0)
+}
+
+
+## GetLatestStats double b64/gzips its event data payload
+## GetLatestStats2 doesn't
+do_get_event_data <- function(guid, ws = "GetLatestStats2", last_time = 0) {
     assert_that(is.string(guid), !is.na(guid))
+    assert_that(is.string(ws))
+    ws <- match.arg(ws, c("GetLatestStats", "GetLatestStats2"))
     if (inherits(last_time, "POSIXt")) last_time <- as.numeric(last_time)/1000
     assert_that(is.numeric(last_time))
-    my_url <- paste0(pa_opt("base_url"), "/", "GetLatestStats?guid=", URLencode(guid), "&lasttime=", last_time)
+    my_url <- paste0(pa_opt("base_url"), "/", ws, "?guid=", URLencode(guid), "&lasttime=", last_time)
     x <- read_xml(my_url)
     x <- xml_text(xml_contents(x)[[1]])
     x <- read.table(text = x, sep = "~", stringsAsFactors = FALSE)
+    if (ncol(x) < 4) stop("No event data is available for this match")
     x <- b64gunz(x[[4]])
     if (!any(grepl("\"", x, fixed = TRUE))) x <- b64gunz(x)
     x
