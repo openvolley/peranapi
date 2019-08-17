@@ -8,3 +8,5 @@ b64gunz <- function(x) {
     on.exit(close(z))
     readLines(z, warn = FALSE)
 }
+
+`%eq%` <- function(x,y) x==y & !is.na(x) & !is.na(y)
