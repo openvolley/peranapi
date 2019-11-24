@@ -1,6 +1,6 @@
 Package: peranapi
 Title: Perana Sports API
-Version: 0.0.5
+Version: 0.0.6
 Authors@R: person("Ben", "Raymond", email = "ben@untan.gl", role = c("aut", "cre"))
 Description: Access the Perana Sports API.
 Depends: R (>= 3.3.0)

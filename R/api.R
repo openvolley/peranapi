@@ -93,14 +93,15 @@ pa_get_event_data <- function(guid, last_time = 0) {
         allinc_parsed <- pparse_multi(allinc$inc) ## parse all at once, even though parsing individually doesn't seem much slower
         for (this_ii in sort(unique(allinc$ii))) {
             iidx <- allinc$ii == this_ii
-            this <- process_increment(allinc$inc[iidx], out, inc_parsed = allinc_parsed[iidx], out_parsed = out_parsed)
+            this <- process_increment(allinc$inc[iidx], out, inc_parsed = allinc_parsed[iidx], out_parsed = out_parsed, current_q_start_time = current_q_start_time, current_q_idx = current_q_idx)
             out <- this$out
             out_parsed <- this$out_parsed
+            current_q_start_time <- this$current_q_start_time
             unprocessed_events <- c(unprocessed_events, this$unprocessed)
         }
         if (length(unprocessed_events) > 0) {
             for (inc in unprocessed_events) {
-                this <- process_increment(inc, out, out_parsed = out_parsed, queue_unprocessed = FALSE)
+                this <- process_increment(inc, out, out_parsed = out_parsed, current_q_start_time = current_q_start_time, current_q_idx = current_q_idx, queue_unprocessed = FALSE)
                 out <- this$out
                 out_parsed <- this$out_parsed
             }
@@ -121,7 +122,7 @@ existing_event_p <- function(parsed_event, existing_parsed) {
     which(vapply(existing_parsed, function(z) "EventId" %in% names(z) && z$EventId == tevid, FUN.VALUE = TRUE))
 }
 
-process_increment <- function(inc, out, queue_unprocessed = TRUE, inc_parsed = NULL, out_parsed, debug = FALSE) {
+process_increment <- function(inc, out, queue_unprocessed = TRUE, inc_parsed = NULL, out_parsed, current_q_start_time, current_q_idx, debug = FALSE) {
     unproc <- c()
     if (is.null(inc_parsed)) inc_parsed <- pparse_multi(inc)
     if (length(inc) == 1 && grepl("^(DELE|MODE)", inc)) {
@@ -190,5 +191,5 @@ process_increment <- function(inc, out, queue_unprocessed = TRUE, inc_parsed = N
         }
     }
     if (debug) cat("\n")
-    list(out = out, out_parsed = out_parsed, unprocessed = unproc)
+    list(out = out, out_parsed = out_parsed, unprocessed = unproc, current_q_start_time = current_q_start_time, current_q_idx = current_q_idx)
 }
