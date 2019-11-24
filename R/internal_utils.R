@@ -10,3 +10,14 @@ b64gunz <- function(x) {
 }
 
 `%eq%` <- function(x,y) x==y & !is.na(x) & !is.na(y)
+
+pparse <- function(z) {
+    temp <- sub("^[A-Z]+~", "", z)
+    if (grepl("^\\(?null\\)?", temp, ignore.case = TRUE)) {
+        NULL
+    } else {
+        jsonlite::fromJSON(temp)
+    }
+}
+
+pparse_multi <- function(z) lapply(z, pparse)
